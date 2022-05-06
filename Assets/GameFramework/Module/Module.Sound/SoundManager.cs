@@ -16,8 +16,22 @@ namespace GameFramework.Module.Sound
         private readonly LoadAssetCallbacks _loadAssetCallbacks;
         private ISoundHelper _soundHelper;
         private int _serial;
+        private static SoundManager _instance;
 
         public int Priority => 0;
+        
+        public static SoundManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    ModuleManager.GetModule<SoundManager>();
+                }
+
+                return _instance;
+            }
+        }
 
         /// <summary>
         /// 获取声音组数量。
@@ -44,6 +58,7 @@ namespace GameFramework.Module.Sound
 
         public void OnCreate()
         {
+            _instance = this;
             Root = GameObject.Find("Launcher/Sound").gameObject;
             CreateSoundHelper<SoundHelperDefault>();
             AddSoundGroup<SoundGroupHelperDefault>("Music");
@@ -416,60 +431,6 @@ namespace GameFramework.Module.Sound
         }
 
         /// <summary>
-        /// 播放声音。
-        /// </summary>
-        /// <param name="soundAssetName">声音资源名称。</param>
-        /// <param name="soundGroupName">声音组名称。</param>
-        /// <param name="priority">加载声音资源的优先级。</param>
-        /// <param name="playSoundParams">播放声音参数。</param>
-        /// <param name="userData">用户自定义数据。</param>
-        /// <returns>声音的序列编号。</returns>
-        public int PlaySound(string soundAssetName, string soundGroupName, int priority,
-            PlaySoundParams playSoundParams, object userData)
-        {
-            if (_soundHelper == null)
-            {
-                throw new Exception("You must set sound helper first.");
-            }
-
-            if (playSoundParams == null)
-            {
-                playSoundParams = PlaySoundParams.Create();
-            }
-
-            var serialId = ++_serial;
-            PlaySoundErrorCode? errorCode = null;
-            string errorMessage = null;
-            var soundGroup = (SoundGroup)GetSoundGroup(soundGroupName);
-            if (soundGroup == null)
-            {
-                errorCode = PlaySoundErrorCode.SoundGroupNotExist;
-                errorMessage = $"Sound group '{soundGroupName}' is not exist.";
-            }
-            else if (soundGroup.SoundAgentCount <= 0)
-            {
-                errorCode = PlaySoundErrorCode.SoundGroupHasNoAgent;
-                errorMessage = $"Sound group '{soundGroupName}' is have no sound agent.";
-            }
-
-            if (errorCode.HasValue)
-            {
-                if (playSoundParams.Referenced)
-                {
-                    ReferencePool.Release(playSoundParams);
-                }
-
-                throw new Exception(errorMessage);
-            }
-
-            _soundsBeingLoaded.Add(serialId);
-
-            var playSoundInfo = PlaySoundInfo.Create(serialId, soundGroup, playSoundParams, userData);
-            _soundHelper.LoadAudioAsset(soundAssetName, priority, playSoundInfo, _loadAssetCallbacks);
-            return serialId;
-        }
-
-        /// <summary>
         /// 停止播放声音。
         /// </summary>
         /// <param name="serialId">要停止播放声音的序列编号。</param>
@@ -588,6 +549,60 @@ namespace GameFramework.Module.Sound
             }
 
             throw new Exception($"Can not find sound '{serialId}'.");
+        }
+        
+        /// <summary>
+        /// 播放声音。
+        /// </summary>
+        /// <param name="soundAssetName">声音资源名称。</param>
+        /// <param name="soundGroupName">声音组名称。</param>
+        /// <param name="priority">加载声音资源的优先级。</param>
+        /// <param name="playSoundParams">播放声音参数。</param>
+        /// <param name="userData">用户自定义数据。</param>
+        /// <returns>声音的序列编号。</returns>
+        public int PlaySound(string soundAssetName, string soundGroupName, int priority,
+            PlaySoundParams playSoundParams, object userData)
+        {
+            if (_soundHelper == null)
+            {
+                throw new Exception("You must set sound helper first.");
+            }
+
+            if (playSoundParams == null)
+            {
+                playSoundParams = PlaySoundParams.Create();
+            }
+
+            var serialId = ++_serial;
+            PlaySoundErrorCode? errorCode = null;
+            string errorMessage = null;
+            var soundGroup = (SoundGroup)GetSoundGroup(soundGroupName);
+            if (soundGroup == null)
+            {
+                errorCode = PlaySoundErrorCode.SoundGroupNotExist;
+                errorMessage = $"Sound group '{soundGroupName}' is not exist.";
+            }
+            else if (soundGroup.SoundAgentCount <= 0)
+            {
+                errorCode = PlaySoundErrorCode.SoundGroupHasNoAgent;
+                errorMessage = $"Sound group '{soundGroupName}' is have no sound agent.";
+            }
+
+            if (errorCode.HasValue)
+            {
+                if (playSoundParams.Referenced)
+                {
+                    ReferencePool.Release(playSoundParams);
+                }
+
+                throw new Exception(errorMessage);
+            }
+
+            _soundsBeingLoaded.Add(serialId);
+
+            var playSoundInfo = PlaySoundInfo.Create(serialId, soundGroup, playSoundParams, userData);
+            _soundHelper.LoadAudioAsset(soundAssetName, priority, playSoundInfo, _loadAssetCallbacks);
+            return serialId;
         }
 
         private void LoadAssetSuccess(string soundAssetName, object soundAsset, object userData)

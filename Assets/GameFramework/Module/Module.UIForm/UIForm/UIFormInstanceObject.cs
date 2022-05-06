@@ -11,17 +11,17 @@ namespace GameFramework.Module.UIForm
     public sealed class UIFormInstanceObject : ObjectBase
     {
         private object _uiFormInstance;
-        private AssetOperationHandle _uiFormAssetHandle;
+        private OpenUIFormInfo _openUIFormInfo;
         private IUIFormHelper _uiFormHelper;
 
         public UIFormInstanceObject()
         {
-            _uiFormAssetHandle = null;
+            _openUIFormInfo = null;
             _uiFormHelper = null;
         }
 
         public static UIFormInstanceObject Create(string name, object uiFormInstance,
-            IUIFormHelper uiFormHelper, AssetOperationHandle handle)
+            IUIFormHelper uiFormHelper, OpenUIFormInfo openUIFormInfo)
         {
             if (uiFormHelper == null)
             {
@@ -31,7 +31,7 @@ namespace GameFramework.Module.UIForm
             var uiFormInstanceObject = ReferencePool.Acquire<UIFormInstanceObject>();
             uiFormInstanceObject.Initialize(name, uiFormInstance);
             uiFormInstanceObject._uiFormInstance = uiFormInstance;
-            uiFormInstanceObject._uiFormAssetHandle = handle;
+            uiFormInstanceObject._openUIFormInfo = openUIFormInfo;
             uiFormInstanceObject._uiFormHelper = uiFormHelper;
             return uiFormInstanceObject;
         }
@@ -39,13 +39,13 @@ namespace GameFramework.Module.UIForm
         public override void Clear()
         {
             base.Clear();
-            _uiFormAssetHandle = null;
+            _openUIFormInfo = null;
             _uiFormHelper = null;
         }
 
         protected internal override void Release(bool isShutdown)
         {
-            _uiFormAssetHandle.Release();
+            _openUIFormInfo.AssetHandle.Release();
             GameObject.Destroy((GameObject)_uiFormInstance);
             _uiFormHelper.ReleaseUIForm(Target);
         }

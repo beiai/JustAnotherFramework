@@ -14,7 +14,7 @@ namespace GameFramework.Module.UIForm
         public void Close()
         {
             StopAllCoroutines();
-            ModuleManager.GetModule<UIManager>().CloseUIForm(UIForm);
+            UIManager.Instance.CloseUIForm(UIForm);
         }
 
         protected internal override void OnInit(object userData)

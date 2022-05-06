@@ -30,7 +30,7 @@ public class GameLauncher : MonoBehaviour
         ModuleManager.Update();
         if (Input.anyKeyDown)
         {
-            ModuleManager.GetModule<SoundManager>().PlaySound("Sound/UI/Click1", "UI");
+            SoundManager.Instance.PlaySound("Sound/UI/Click1", "UI");
         }
     }
 
@@ -114,7 +114,7 @@ public class GameLauncher : MonoBehaviour
             yield return YooAssets.InitializeAsync(createParameters);
         }
         
-        ModuleManager.GetModule<UIManager>().OpenUIForm("UIForm/UIMain.prefab", "Default");
+        UIManager.Instance.OpenUIForm("UIForm/UIMain.prefab", "Default");
     }
     
     private string GetHostServerURL()

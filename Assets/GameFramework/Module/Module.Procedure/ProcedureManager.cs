@@ -10,6 +10,7 @@ namespace GameFramework.Module.Procedure
     {
         private IFsmManager _fsmManager;
         private IFsm<IProcedureManager> _procedureFsm;
+        private static ProcedureManager _instance;
 
         /// <summary>
         /// 初始化流程管理器的新实例。
@@ -25,6 +26,19 @@ namespace GameFramework.Module.Procedure
         /// </summary>
         /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
         public int Priority => 0;
+        
+        public static ProcedureManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    ModuleManager.GetModule<ProcedureManager>();
+                }
+
+                return _instance;
+            }
+        }
 
         /// <summary>
         /// 获取当前流程。
@@ -60,6 +74,7 @@ namespace GameFramework.Module.Procedure
 
         public void OnCreate()
         {
+            _instance = this;
         }
 
         /// <summary>

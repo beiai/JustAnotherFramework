@@ -15,6 +15,8 @@ namespace GameFramework.Module.ObjectPool
         private readonly Dictionary<string, ObjectPoolBase> _objectPools;
         private readonly List<ObjectPoolBase> _cachedAllObjectPools;
         private readonly Comparison<ObjectPoolBase> _objectPoolComparer;
+        
+        private static ObjectPoolManager _instance;
 
         /// <summary>
         /// 初始化对象池管理器的新实例。
@@ -36,9 +38,23 @@ namespace GameFramework.Module.ObjectPool
         /// 获取对象池数量。
         /// </summary>
         public int Count => _objectPools.Count;
+        
+        public static ObjectPoolManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    ModuleManager.GetModule<ObjectPoolManager>();
+                }
+
+                return _instance;
+            }
+        }
 
         public void OnCreate()
         {
+            _instance = this;
         }
 
         /// <summary>

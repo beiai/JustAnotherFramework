@@ -10,6 +10,7 @@ namespace GameFramework.Module.Fsm
     {
         private readonly Dictionary<string, FsmBase> _fsmDict;
         private readonly List<FsmBase> _tempFsmList;
+        private static FsmManager _instance;
 
         /// <summary>
         /// 初始化有限状态机管理器的新实例。
@@ -31,8 +32,22 @@ namespace GameFramework.Module.Fsm
         /// </summary>
         public int Count => _fsmDict.Count;
 
+        public static FsmManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    ModuleManager.GetModule<FsmManager>();
+                }
+
+                return _instance;
+            }
+        }
+
         public void OnCreate()
         {
+            _instance = this;
         }
 
         /// <summary>

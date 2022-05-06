@@ -8,6 +8,7 @@ namespace GameFramework.Module.Event
     internal sealed class EventManager : IEventManager, IModule
     {
         private readonly EventPool<GameEventArgs> _eventPool;
+        private static EventManager _instance;
 
         /// <summary>
         /// 初始化事件管理器的新实例。
@@ -29,8 +30,22 @@ namespace GameFramework.Module.Event
 
         public int Priority => 0;
 
+        public static EventManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    ModuleManager.GetModule<EventManager>();
+                }
+
+                return _instance;
+            }
+        }
+
         public void OnCreate()
         {
+            _instance = this;
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using YooAsset;
+﻿using GameFramework.Module.Resource;
+using YooAsset;
 
 namespace GameFramework.Module.UIForm
 {
@@ -10,13 +11,11 @@ namespace GameFramework.Module.UIForm
         /// <summary>
         /// 加载界面资源
         /// </summary>
-        /// <param name="serialId">界面 ID。</param>
-        /// <param name="uiFormAssetName">界面资源名称。</param>
-        /// <param name="uiGroup">界面组名称。</param>
-        /// <param name="pauseCoveredUIForm">是否暂停被覆盖的界面。</param>
+        /// <param name="uiAssetName">要加载资源的名称。</param>
+        /// <param name="priority">加载资源的优先级。</param>
         /// <param name="userData">用户自定义数据。</param>
-        void LoadUIFormAsset(int serialId, string uiFormAssetName, UIGroup uiGroup, bool pauseCoveredUIForm,
-            object userData);
+        /// <param name="loadAssetCallbacks">加载资源回调函数集。</param>
+        void LoadUIFormAsset(string uiAssetName, int priority, object userData, LoadAssetCallbacks loadAssetCallbacks);
 
         /// <summary>
         /// 获取界面资源
@@ -29,9 +28,8 @@ namespace GameFramework.Module.UIForm
         /// 实例化界面。
         /// </summary>
         /// <param name="uiFormAssetName"></param>
-        /// <param name="handle"></param>
-        /// <returns>实例化后的界面。</returns>
-        object AddUIFormAsset(string uiFormAssetName, AssetOperationHandle handle);
+        /// <param name="userData">用户自定义数据。</param>
+        object AddUIFormAsset(string uiFormAssetName, object userData);
 
         /// <summary>
         /// 创建界面。

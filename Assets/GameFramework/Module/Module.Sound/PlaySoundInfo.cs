@@ -7,7 +7,6 @@ namespace GameFramework.Module.Sound
         private int _serialId;
         private SoundGroup _soundGroup;
         private PlaySoundParams _playSoundParams;
-        private AssetOperationHandle _assetHandle;
         private object _userData;
 
         public PlaySoundInfo()
@@ -15,7 +14,6 @@ namespace GameFramework.Module.Sound
             _serialId = 0;
             _soundGroup = null;
             _playSoundParams = null;
-            _assetHandle = null;
             _userData = null;
         }
 
@@ -25,13 +23,9 @@ namespace GameFramework.Module.Sound
 
         public PlaySoundParams PlaySoundParams => _playSoundParams;
 
-        public AssetOperationHandle AssetHandle
-        {
-            get => _assetHandle;
-            set => _assetHandle = value;
-        }
-
         public object UserData => _userData;
+        
+        public AssetOperationHandle AssetHandle { get; set; }
 
         public static PlaySoundInfo Create(int serialId, SoundGroup soundGroup, PlaySoundParams playSoundParams,
             object userData)

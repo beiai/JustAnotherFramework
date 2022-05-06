@@ -1,4 +1,5 @@
 ﻿using GameFramework.Module.ObjectPool;
+using GameFramework.Module.Resource;
 using UnityEngine;
 using YooAsset;
 
@@ -11,23 +12,42 @@ namespace GameFramework.Module.UIForm
     {
         private IObjectPool<UIFormInstanceObject> _uiFormObjectPool;
 
-        public override void LoadUIFormAsset(int serialId, string uiFormAssetName, UIGroup uiGroup,
-            bool pauseCoveredUIForm, object userData)
+        /// <summary>
+        /// 加载界面资源
+        /// </summary>
+        /// <param name="uiAssetName">要加载资源的名称。</param>
+        /// <param name="priority">加载资源的优先级。</param>
+        /// <param name="userData">用户自定义数据。</param>
+        /// <param name="loadAssetCallbacks">加载资源回调函数集。</param>
+        public override void LoadUIFormAsset(string uiAssetName, int priority, object userData, LoadAssetCallbacks loadAssetCallbacks)
         {
-            var handle = YooAssets.LoadAssetAsync<GameObject>(uiFormAssetName);
+            var handle = YooAssets.LoadAssetAsync<GameObject>(uiAssetName);
             handle.Completed += assetOperationHandle =>
             {
-                ModuleManager.GetModule<UIManager>().LoadAssetCallback(serialId, uiFormAssetName, uiGroup,
-                    pauseCoveredUIForm, userData, handle);
+                if (handle.Status == EOperationStatus.Succeed)
+                {
+                    var openUIFormInfo = (OpenUIFormInfo)userData;
+                    openUIFormInfo.AssetHandle = handle;
+                    loadAssetCallbacks.LoadAssetSuccessCallback.Invoke(uiAssetName, handle.AssetObject, userData);
+                }
+                else
+                {
+                    loadAssetCallbacks.LoadAssetFailureCallback.Invoke(uiAssetName, handle.LastError, userData);
+                }
             };
         }
 
+        /// <summary>
+        /// 获取界面资源
+        /// </summary>
+        /// <param name="uiFormAssetName">界面资源名称</param>
+        /// <returns></returns>
         public override UIFormInstanceObject GetUIFormAsset(string uiFormAssetName)
         {
             if (_uiFormObjectPool == null)
             {
-                _uiFormObjectPool = ModuleManager.GetModule<ObjectPoolManager>()
-                    .CreateSingleSpawnObjectPool<UIFormInstanceObject>("UI Instance Pool");
+                _uiFormObjectPool =
+                    ObjectPoolManager.Instance.CreateSingleSpawnObjectPool<UIFormInstanceObject>("UI Instance Pool");
                 return null;
             }
 
@@ -38,12 +58,13 @@ namespace GameFramework.Module.UIForm
         /// 实例化界面。
         /// </summary>
         /// <param name="uiFormAssetName"></param>
-        /// <param name="handle"></param>
+        /// <param name="userData">用户自定义数据。</param>
         /// <returns>实例化后的界面。</returns>
-        public override object AddUIFormAsset(string uiFormAssetName, AssetOperationHandle handle)
+        public override object AddUIFormAsset(string uiFormAssetName, object userData)
         {
-            var uiFormInstance = Instantiate(handle.AssetObject);
-            var uiFormInstanceObject = UIFormInstanceObject.Create(uiFormAssetName, uiFormInstance, this, handle);
+            var openUIFormInfo = (OpenUIFormInfo)userData;
+            var uiFormInstance = Instantiate(openUIFormInfo.AssetHandle.AssetObject);
+            var uiFormInstanceObject = UIFormInstanceObject.Create(uiFormAssetName, uiFormInstance, this, openUIFormInfo);
             _uiFormObjectPool.Register(uiFormInstanceObject, true);
             return uiFormInstance;
         }

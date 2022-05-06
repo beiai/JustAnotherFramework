@@ -9,6 +9,7 @@ namespace GameFramework.Module.Setting
     internal sealed class SettingManager : IModule, ISettingManager
     {
         private ISettingHelper _settingHelper;
+        private static SettingManager _instance;
 
         /// <summary>
         /// 初始化游戏配置管理器的新实例。
@@ -35,9 +36,23 @@ namespace GameFramework.Module.Setting
         }
 
         public int Priority => 0;
+        
+        public static SettingManager Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    ModuleManager.GetModule<SettingManager>();
+                }
+
+                return _instance;
+            }
+        }
 
         public void OnCreate()
         {
+            _instance = this;
             _settingHelper = new SettingHelperPlayerPrefs();
         }
 
