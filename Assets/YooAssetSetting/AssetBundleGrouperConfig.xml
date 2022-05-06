@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <Grouper GrouperName="Default Grouper" GrouperDesc="" AssetTags="">
+    <Collector CollectPath="Assets/GameRes/UIForm/UIRoot" PackRule="PackSeparately" FilterRule="CollectAll" NotWriteToAssetList="False" AssetTags="" />
+  </Grouper>
+</root>

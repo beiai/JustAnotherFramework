@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <Common AutoAddressable="False" AutoCollectShader="False" ShaderBundleName="myshaders" />
+  <Group GroupName="Default Group" GroupDesc="" AssetTags="Default Group">
+    <Collector CollectPath="Assets/GameRes/UIForm" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="UI" />
+    <Collector CollectPath="Assets/GameRes/Sound" CollectType="MainAssetCollector" AddressRule="AddressByFileName" PackRule="PackDirectory" FilterRule="CollectAll" AssetTags="" />
+  </Group>
+</root>
