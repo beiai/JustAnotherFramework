@@ -172,6 +172,7 @@ namespace YooAsset
 
 			if (_steps == ESteps.UpdateVerifyingCache)
 			{
+				Progress = GetVerifyProgress();
 				if (UpdateVerifyingCache())
 				{
 					_steps = ESteps.Done;
@@ -201,7 +202,8 @@ namespace YooAsset
 		{
 			try
 			{
-				_impl.LocalPatchManifest = PatchManifest.Deserialize(content);
+				var remotePatchManifest = PatchManifest.Deserialize(content);
+				_impl.SetLocalPatchManifest(remotePatchManifest);
 
 				YooLogger.Log("Save remote patch manifest file.");
 				string savePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.GetPatchManifestFileName(updateResourceVersion));
@@ -223,7 +225,8 @@ namespace YooAsset
 			YooLogger.Log("Load sandbox patch manifest file.");
 			string filePath = PathHelper.MakePersistentLoadPath(YooAssetSettingsData.GetPatchManifestFileName(updateResourceVersion));
 			string jsonData = File.ReadAllText(filePath);
-			_impl.LocalPatchManifest = PatchManifest.Deserialize(jsonData);
+			var sandboxPatchManifest = PatchManifest.Deserialize(jsonData);
+			_impl.SetLocalPatchManifest(sandboxPatchManifest);
 		}
 
 		/// <summary>
@@ -256,6 +259,7 @@ namespace YooAsset
 		private readonly List<PatchBundle> _verifyingList = new List<PatchBundle>(100);
 		private readonly ThreadSyncContext _syncContext = new ThreadSyncContext();
 		private int _verifyMaxNum = 32;
+		private int _verifyTotalCount = 0;
 		private int _verifySuccessCount = 0;
 		private int _verifyFailCount = 0;
 
@@ -288,6 +292,7 @@ namespace YooAsset
 			ThreadPool.GetMaxThreads(out int workerThreads, out int ioThreads);
 			YooLogger.Log($"Work threads : {workerThreads}, IO threads : {ioThreads}");
 			_verifyMaxNum = Math.Min(workerThreads, ioThreads);
+			_verifyTotalCount = _waitingList.Count;
 		}
 		private bool UpdateVerifyingCache()
 		{
@@ -327,16 +332,8 @@ namespace YooAsset
 		}
 		private void VerifyInThread(object infoObj)
 		{
-			// 验证沙盒内的文件
 			ThreadInfo info = (ThreadInfo)infoObj;
-			try
-			{
-				info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.SizeBytes, info.Bundle.CRC);
-			}
-			catch (Exception)
-			{
-				info.Result = false;
-			}
+			info.Result = DownloadSystem.CheckContentIntegrity(info.FilePath, info.Bundle.SizeBytes, info.Bundle.CRC);
 			_syncContext.Post(VerifyCallback, info);
 		}
 		private void VerifyCallback(object obj)
@@ -355,6 +352,12 @@ namespace YooAsset
 					File.Delete(info.FilePath);
 			}
 			_verifyingList.Remove(info.Bundle);
+		}
+		private float GetVerifyProgress()
+		{
+			if (_verifyTotalCount == 0)
+				return 1f;
+			return (float)(_verifySuccessCount + _verifyFailCount) / _verifyTotalCount;
 		}
 		#endregion
 	}

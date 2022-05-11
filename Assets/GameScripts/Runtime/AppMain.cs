@@ -18,7 +18,7 @@ public class AppMain : MonoBehaviour
     private Type _hotfixType;
     private MethodInfo _hotfixMain;
     private Delegate _hotfixUpdate;
-    public YooAssets.EPlayMode playMode = YooAssets.EPlayMode.EditorPlayMode;
+    public YooAssets.EPlayMode playMode = YooAssets.EPlayMode.EditorSimulateMode;
 
     private void Awake()
     {
@@ -85,9 +85,9 @@ public class AppMain : MonoBehaviour
         Debug.Log($"资源系统运行模式：{playMode}");
 
         // 编辑器模拟模式
-        if (playMode == YooAssets.EPlayMode.EditorPlayMode)
+        if (playMode == YooAssets.EPlayMode.EditorSimulateMode)
         {
-            var createParameters = new YooAssets.EditorPlayModeParameters();
+            var createParameters = new YooAssets.EditorSimulateModeParameters();
             createParameters.LocationServices = new DefaultLocationServices("Assets/GameRes");
             yield return YooAssets.InitializeAsync(createParameters);
         }

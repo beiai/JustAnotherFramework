@@ -89,6 +89,13 @@ namespace YooAsset.Editor
 		/// </summary>
 		public List<CollectAssetInfo> GetAllCollectAssets(AssetBundleCollectorGroup group)
 		{
+			// 注意：模拟构建模式下只收集主资源
+			if (AssetBundleCollectorSetting.BuildMode == EBuildMode.SimulateBuild)
+			{
+				if (CollectorType != ECollectorType.MainAssetCollector)
+					return new List<CollectAssetInfo>();
+			}
+
 			Dictionary<string, CollectAssetInfo> result = new Dictionary<string, CollectAssetInfo>(1000);
 			bool isRawAsset = PackRuleName == nameof(PackRawFile);
 
@@ -235,6 +242,10 @@ namespace YooAsset.Editor
 		}
 		private List<string> GetAllDependencies(string mainAssetPath)
 		{
+			// 注意：模拟构建模式下不需要收集依赖资源
+			if(AssetBundleCollectorSetting.BuildMode == EBuildMode.SimulateBuild)
+				return new List<string>();
+
 			List<string> result = new List<string>();
 			string[] depends = AssetDatabase.GetDependencies(mainAssetPath, true);
 			foreach (string assetPath in depends)
