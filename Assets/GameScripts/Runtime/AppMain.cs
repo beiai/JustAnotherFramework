@@ -8,6 +8,7 @@ using GameFramework.Module.ObjectPool;
 using GameFramework.Module.Procedure;
 using GameFramework.Module.Setting;
 using GameFramework.Module.Sound;
+using GameFramework.Module.Timer;
 using GameFramework.Module.UIForm;
 using UnityEngine;
 using YooAsset;
@@ -49,6 +50,7 @@ public class AppMain : MonoBehaviour
         ModuleManager.GetModule<SettingManager>();
         ModuleManager.GetModule<UIManager>();
         ModuleManager.GetModule<SoundManager>();
+        ModuleManager.GetModule<TimerManager>();
     }
 
     /// <summary>
