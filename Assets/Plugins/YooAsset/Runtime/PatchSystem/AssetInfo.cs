@@ -26,9 +26,20 @@ namespace YooAsset
 		}
 
 		/// <summary>
-		/// 资源对象名称
+		/// 身份是否无效
 		/// </summary>
-		public string AssetName { private set; get; }
+		internal bool IsInvalid
+		{
+			get
+			{
+				return _patchAsset == null;
+			}
+		}
+
+		/// <summary>
+		/// 错误信息
+		/// </summary>
+		internal string Error { private set; get; }
 
 		/// <summary>
 		/// 资源路径
@@ -40,23 +51,8 @@ namespace YooAsset
 		/// </summary>
 		public System.Type AssetType { private set; get; }
 
-		/// <summary>
-		/// 身份是否无效
-		/// </summary>
-		public bool IsInvalid
-		{
-			get
-			{
-				return _patchAsset == null;
-			}
-		}
 
-		/// <summary>
-		/// 错误信息
-		/// </summary>
-		public string Error { private set; get; }
-
-
+		// 注意：这是一个内部类，严格限制外部创建。
 		private AssetInfo()
 		{
 		}
@@ -68,7 +64,6 @@ namespace YooAsset
 			_patchAsset = patchAsset;
 			AssetType = assetType;
 			AssetPath = patchAsset.AssetPath;
-			AssetName = Path.GetFileName(patchAsset.AssetPath);
 			Error = string.Empty;
 		}
 		internal AssetInfo(PatchAsset patchAsset)
@@ -79,7 +74,6 @@ namespace YooAsset
 			_patchAsset = patchAsset;
 			AssetType = null;
 			AssetPath = patchAsset.AssetPath;
-			AssetName = Path.GetFileName(patchAsset.AssetPath);
 			Error = string.Empty;
 		}
 		internal AssetInfo(string error)
@@ -87,7 +81,6 @@ namespace YooAsset
 			_patchAsset = null;
 			AssetType = null;
 			AssetPath = string.Empty;
-			AssetName = string.Empty;
 			Error = error;
 		}
 	}
