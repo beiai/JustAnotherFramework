@@ -130,6 +130,11 @@ namespace GameFramework.Module.Timer
 
         public void Shutdown()
         {
+            foreach (var timer in _timers)
+            {
+                RemoveTimer(timer.Key);
+            }
+            _timers.Clear();
         }
 
         /// <summary>
@@ -226,23 +231,6 @@ namespace GameFramework.Module.Timer
                 ReferencePool.Release(_pausedTimer[id]);
                 _pausedTimer.Remove(id);
             }
-        }
-
-        /// <summary>
-        /// 取消计时器
-        /// </summary>
-        /// <param name="id">定时器ID</param>
-        public void CancelTimer(int id)
-        {
-            if (_pausedTimer.ContainsKey(id))
-            {
-                ReferencePool.Release(_pausedTimer[id].Timer);
-                ReferencePool.Release(_pausedTimer[id]);
-                _pausedTimer.Remove(id);
-                return;
-            }
-
-            RemoveTimer(id);
         }
 
         /// <summary>

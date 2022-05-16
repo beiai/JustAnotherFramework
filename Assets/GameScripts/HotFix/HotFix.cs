@@ -12,7 +12,7 @@ public class HotFix
         UIManager.Instance.OpenUIForm("UIForm/UIMain.prefab", "Default");
         Debug.Log("Open UI Form");
 
-        TimerManager.Instance.AddRepeatedTimer(500, 1,
+        TimerManager.Instance.AddRepeatedTimer(500, 0,
             (timeLeft, userData) => { Log.Debug($"执行！剩余时间:{timeLeft}"); }, null,
             timeLeft => { Log.Debug($"Update执行！剩余时间:{timeLeft}"); }
         );
