@@ -222,7 +222,7 @@ namespace GameFramework.Module.Timer
                 Log.Error($"删除了不存在的Timer ID:{id}");
                 return;
             }
-
+			_timeId.Remove(timer.StartTime + timer.Time, timer.ID);
             ReferencePool.Release(timer);
             _timers.Remove(id);
             _updateTimer.Remove(id);
