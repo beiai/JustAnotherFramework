@@ -132,7 +132,7 @@ namespace GameFramework.Module.Timer
         {
             foreach (var timer in _timers)
             {
-                RemoveTimer(timer.Key);
+                RemoveTimerInternal(timer.Value);
             }
             _timers.Clear();
         }
@@ -214,7 +214,7 @@ namespace GameFramework.Module.Timer
         /// 删除定时器
         /// </summary>
         /// <param name="id">定时器ID</param>
-        private void RemoveTimer(int id)
+        public void RemoveTimer(int id)
         {
             _timers.TryGetValue(id, out var timer);
             if (timer == null)
@@ -222,15 +222,24 @@ namespace GameFramework.Module.Timer
                 Log.Error($"删除了不存在的Timer ID:{id}");
                 return;
             }
-			_timeId.Remove(timer.StartTime + timer.Time, timer.ID);
-            ReferencePool.Release(timer);
+
+            RemoveTimerInternal(timer);
             _timers.Remove(id);
-            _updateTimer.Remove(id);
-            if (_pausedTimer.ContainsKey(id))
-            {
-                ReferencePool.Release(_pausedTimer[id]);
-                _pausedTimer.Remove(id);
-            }
+        }
+
+        /// <summary>
+        /// 删除计时器
+        /// </summary>
+        /// <param name="timer">定时器</param>
+        private void RemoveTimerInternal(Timer timer)
+        {
+            _timeId.Remove(timer.StartTime + timer.Time, timer.ID);
+            ReferencePool.Release(timer);
+            
+            _updateTimer.Remove(timer.ID);
+            if (!_pausedTimer.ContainsKey(timer.ID)) return;
+            ReferencePool.Release(_pausedTimer[timer.ID]);
+            _pausedTimer.Remove(timer.ID);
         }
 
         /// <summary>
@@ -289,11 +298,11 @@ namespace GameFramework.Module.Timer
         }
 
         /// <summary>
-        /// 修改定时器时间
+        /// 修改定时器启动时间
         /// </summary>
         /// <param name="id">定时器ID</param>
-        /// <param name="time">修改时间</param>
-        /// <param name="isChangeRepeat">是否修改如果是RepeatTimer每次运行时间</param>
+        /// <param name="time">时间偏移</param>
+        /// <param name="isChangeRepeat">如果是 RepeatTimer 是否修改每次运行时间</param>
         public void ChangeTime(int id, long time, bool isChangeRepeat = false)
         {
             _pausedTimer.TryGetValue(id, out var pausedTimer);
